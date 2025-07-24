@@ -71,18 +71,14 @@ app.MapGet("api/coupon/{id:int}", (int id) =>
 .WithName("GetCouponById")
 .Produces<Coupon>(200);
 
-app.MapPost("api/coupon", (IMapper _mapper, [FromBody] CouponCreateDTO couponCreateDTO) =>
+app.MapPost("api/coupon", (IMapper _mapper, IValidator<CouponCreateDTO> createCouponValidator, [FromBody] CouponCreateDTO couponCreateDTO) =>
 {
-	if(string.IsNullOrWhiteSpace(couponCreateDTO.Name))
+	var results = createCouponValidator.ValidateAsync(couponCreateDTO).GetAwaiter().GetResult();
+	if (!results.IsValid)
 	{
-		return Results.BadRequest("Invalid coupon request.");
+		return Results.BadRequest(results.Errors.ToList());
 	}
-
-	if(CouponStore.Coupons.FirstOrDefault(c=> c.Name.ToLower() == couponCreateDTO.Name.ToLower()) is not null)
-	{
-		return Results.BadRequest("Coupon already exists.");
-	}
-
+	
 	var coupon = _mapper.Map<CouponCreateDTO, Coupon>(couponCreateDTO);
 	coupon.CreatedDate = DateTime.Now;
 	coupon.Id = CouponStore.Coupons is null ? 1 : CouponStore.Coupons.Max(c => c.Id) + 1;
