@@ -1,3 +1,5 @@
+using MinimalAPI.Demo.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -34,6 +36,13 @@ if (app.Environment.IsDevelopment())
 
 //	return Results.Ok($"Hello World From POST Endpoint with value {value}");
 //});
+
+#region Coupon Endpoints
+app.MapGet("api/coupon", () =>
+{
+	return Results.Ok(CouponStore.Coupons);
+});
+#endregion
 
 app.UseHttpsRedirection();
 
