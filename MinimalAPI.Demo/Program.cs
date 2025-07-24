@@ -64,7 +64,7 @@ app.MapPost("api/coupon", ([FromBody] Coupon coupon) =>
 
 	coupon.Id = CouponStore.Coupons is null ? 1 : CouponStore.Coupons.Max(c => c.Id) + 1;
 	CouponStore.Coupons.Add(coupon);
-	return Results.Created();
+	return Results.Created($"/api/coupon/{coupon.Id}", coupon);
 });
 #endregion
 
