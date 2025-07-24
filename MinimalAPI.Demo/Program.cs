@@ -16,8 +16,16 @@ if (app.Environment.IsDevelopment())
 	app.UseSwaggerUI();
 }
 
-app.MapGet("/helloworld", () => "Hello World From Get Endpoint");
-app.MapPost("/helloworld", () => "Hello World From Post Endpoint");
+app.MapGet("/helloworld", () => Results.Ok("Hello World From Get Endpoint"));
+app.MapPost("/helloworld", (string? value) =>
+{
+	if (string.IsNullOrWhiteSpace(value))
+	{
+		return Results.BadRequest("Value is null");
+	}
+
+	return Results.Ok($"Hello World From POST Endpoint with value {value}");
+});
 
 app.UseHttpsRedirection();
 
