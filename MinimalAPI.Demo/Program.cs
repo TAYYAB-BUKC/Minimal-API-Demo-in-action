@@ -140,7 +140,7 @@ app.MapPut("api/coupon", async (IMapper _mapper, IValidator<CouponUpdateDTO> cou
 	//coupon.CreatedDate = createdDate;
 	coupon.LastUpdatedDate = DateTime.Now;
 
-	response.Data = coupon;
+	response.Data = _mapper.Map<CouponDTO>(coupon);
 	response.IsSuccess = true;
 	response.StatusCode = HttpStatusCode.OK;
 	return Results.Ok(response);
