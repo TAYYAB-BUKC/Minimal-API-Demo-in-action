@@ -1,10 +1,13 @@
 using AutoMapper;
 using FluentValidation;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MinimalAPI.Demo.Data;
 using MinimalAPI.Demo.DTOs;
 using MinimalAPI.Demo.Mappings;
 using MinimalAPI.Demo.Models;
+using System.Net;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -59,24 +62,40 @@ if (app.Environment.IsDevelopment())
 app.MapGet("api/coupon", (ILogger<Program> _logger) =>
 {
 	_logger.Log(LogLevel.Information, "Getting All Coupons");
-	return Results.Ok(CouponStore.Coupons);
+	APIResponse response = new()
+	{
+		Data = CouponStore.Coupons,
+		IsSuccess = true,
+		StatusCode = HttpStatusCode.OK,
+	};
+	return Results.Ok(response);
 })
 .WithName("GetCoupons")
-.Produces<IEnumerable<Coupon>>(200);
+.Produces<APIResponse>(200);
 
 app.MapGet("api/coupon/{id:int}", (int id) =>
 {
-	return Results.Ok(CouponStore.Coupons.FirstOrDefault(c => c.Id == id));
+	APIResponse response = new()
+	{
+		Data = CouponStore.Coupons.FirstOrDefault(c => c.Id == id),
+		IsSuccess = true,
+		StatusCode = HttpStatusCode.OK,
+	};
+	return Results.Ok(response);
 })
 .WithName("GetCouponById")
-.Produces<Coupon>(200);
+.Produces<APIResponse>(200);
 
 app.MapPost("api/coupon", async (IMapper _mapper, IValidator<CouponCreateDTO> createCouponValidator, [FromBody] CouponCreateDTO couponCreateDTO) => 
 {
+	APIResponse response = new();
 	var results = await createCouponValidator.ValidateAsync(couponCreateDTO);
 	if (!results.IsValid)
 	{
-		return Results.BadRequest(results.Errors.ToList());
+		response.ErrorMessages = results.Errors.Select(e => e.ErrorMessage).ToList();
+		response.IsSuccess = false;
+		response.StatusCode = HttpStatusCode.BadRequest;
+		return Results.BadRequest(response);
 	}
 	
 	var coupon = _mapper.Map<CouponCreateDTO, Coupon>(couponCreateDTO);
@@ -85,12 +104,15 @@ app.MapPost("api/coupon", async (IMapper _mapper, IValidator<CouponCreateDTO> cr
 	CouponStore.Coupons.Add(coupon);
 
 	var couponDTO = _mapper.Map<Coupon, CouponDTO>(coupon);
-	return Results.CreatedAtRoute("GetCouponById", new { id = couponDTO.Id }, couponDTO);
+	response.Data = couponDTO;
+	response.IsSuccess = true;
+	response.StatusCode = HttpStatusCode.Created;
+	return Results.CreatedAtRoute("GetCouponById", new { id = couponDTO.Id }, response);
 })
 .WithName("CreateCoupon")
 .Accepts<CouponCreateDTO>("application/json")
-.Produces<CouponDTO>(201)
-.Produces(400);
+.Produces<APIResponse>(201)
+.Produces<APIResponse>(400);
 
 #endregion
 
