@@ -71,6 +71,7 @@ app.MapPost("api/coupon", ([FromBody] Coupon coupon) =>
 	return Results.CreatedAtRoute("GetCouponById", new { id = coupon.Id }, coupon);
 })
 .WithName("CreateCoupon")
+.Accepts<Coupon>("application/json")
 .Produces<Coupon>(201)
 .Produces(400);
 
