@@ -114,6 +114,35 @@ app.MapPost("api/coupon", async (IMapper _mapper, IValidator<CouponCreateDTO> cr
 .Produces<APIResponse>(201)
 .Produces<APIResponse>(400);
 
+app.MapDelete("api/coupon/{id:int}", (int id) =>
+{
+	APIResponse response = new();
+	if (id <= 0)
+	{
+		response.ErrorMessages = new() { "Invalid request" };
+		response.IsSuccess = false;
+		response.StatusCode = HttpStatusCode.BadRequest;
+		return Results.BadRequest(response);
+	}
+
+	var coupon = CouponStore.Coupons.FirstOrDefault(c => c.Id == id);
+	if(coupon is null)
+	{
+		response.ErrorMessages = new() { "Coupon not found" };
+		response.IsSuccess = false;
+		response.StatusCode = HttpStatusCode.NotFound;
+		return Results.NotFound(response);
+	}
+
+	CouponStore.Coupons.Remove(coupon);
+	response.IsSuccess = true;
+	response.StatusCode = HttpStatusCode.OK;
+	return Results.Ok(response);
+})
+.WithName("DeleteCouponById")
+.Produces<APIResponse>(400)
+.Produces<APIResponse>(200)
+.Produces<APIResponse>(404);
 #endregion
 
 app.UseHttpsRedirection();
