@@ -16,24 +16,24 @@ if (app.Environment.IsDevelopment())
 	app.UseSwaggerUI();
 }
 
-app.MapGet("/helloworld/{id:int}", (int id) =>
-{
-	if (id <= 0)
-	{
-		return Results.BadRequest("Incorrect Id");
-	}
+//app.MapGet("/helloworld/{id:int}", (int id) =>
+//{
+//	if (id <= 0)
+//	{
+//		return Results.BadRequest("Incorrect Id");
+//	}
 
-	return Results.Ok($"Hello World From GET Endpoint with id {id}");
-});
-app.MapPost("/helloworld", (string? value) =>
-{
-	if (string.IsNullOrWhiteSpace(value))
-	{
-		return Results.BadRequest("Value is null");
-	}
+//	return Results.Ok($"Hello World From GET Endpoint with id {id}");
+//});
+//app.MapPost("/helloworld", (string? value) =>
+//{
+//	if (string.IsNullOrWhiteSpace(value))
+//	{
+//		return Results.BadRequest("Value is null");
+//	}
 
-	return Results.Ok($"Hello World From POST Endpoint with value {value}");
-});
+//	return Results.Ok($"Hello World From POST Endpoint with value {value}");
+//});
 
 app.UseHttpsRedirection();
 
