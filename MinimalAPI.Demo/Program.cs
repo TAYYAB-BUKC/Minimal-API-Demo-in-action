@@ -17,6 +17,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapGet("/helloworld", () => "Hello World From Get Endpoint");
+app.MapPost("/helloworld", () => "Hello World From Post Endpoint");
 
 app.UseHttpsRedirection();
 
