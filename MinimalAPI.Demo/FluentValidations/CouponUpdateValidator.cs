@@ -9,6 +9,7 @@ namespace MinimalAPI.Demo.FluentValidations
 	{
 		public CouponUpdateValidator()
 		{
+			RuleFor(c => c.Id).NotEmpty().GreaterThan(0);
 			RuleFor(c => c.Name).Must((coupon, name) => IsNameUnique(name, coupon)).NotEmpty();
 			RuleFor(c => c.Percent).InclusiveBetween(1, 100);
 		}
