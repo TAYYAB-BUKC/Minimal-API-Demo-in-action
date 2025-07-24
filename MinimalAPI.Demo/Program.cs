@@ -114,6 +114,43 @@ app.MapPost("api/coupon", async (IMapper _mapper, IValidator<CouponCreateDTO> cr
 .Produces<APIResponse>(201)
 .Produces<APIResponse>(400);
 
+app.MapPut("api/coupon", async (IMapper _mapper, IValidator<CouponUpdateDTO> couponUpdateValidator, [FromBody] CouponUpdateDTO couponUpdateDTO) =>
+{
+	APIResponse response = new();
+	var coupon = CouponStore.Coupons.FirstOrDefault(c => c.Id == couponUpdateDTO.Id);
+	if (coupon is null)
+	{
+		response.ErrorMessages = new() { "Coupon not found" };
+		response.IsSuccess = false;
+		response.StatusCode = HttpStatusCode.NotFound;
+		return Results.NotFound(response);
+	}
+
+	var results = await couponUpdateValidator.ValidateAsync(couponUpdateDTO);
+	if (!results.IsValid)
+	{
+		response.ErrorMessages = results.Errors.Select(e => e.ErrorMessage).ToList();
+		response.IsSuccess = false;
+		response.StatusCode = HttpStatusCode.BadRequest;
+		return Results.BadRequest(response);
+	}
+
+	//var createdDate = coupon.CreatedDate;
+	_mapper.Map(couponUpdateDTO, coupon);
+	//coupon.CreatedDate = createdDate;
+	coupon.LastUpdatedDate = DateTime.Now;
+
+	response.Data = coupon;
+	response.IsSuccess = true;
+	response.StatusCode = HttpStatusCode.OK;
+	return Results.Ok(response);
+})
+.WithName("UpdateCoupon")
+.Accepts<CouponUpdateDTO>("application/json")
+.Produces<APIResponse>(200)
+.Produces<APIResponse>(400)
+.Produces<APIResponse>(404);
+
 app.MapDelete("api/coupon/{id:int}", (int id) =>
 {
 	APIResponse response = new();
