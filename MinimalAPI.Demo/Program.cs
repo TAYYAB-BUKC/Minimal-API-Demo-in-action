@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using MinimalAPI.Demo.Data;
@@ -69,7 +70,7 @@ app.MapGet("api/coupon/{id:int}", (int id) =>
 .WithName("GetCouponById")
 .Produces<Coupon>(200);
 
-app.MapPost("api/coupon", ([FromBody] CouponCreateDTO couponCreateDTO) =>
+app.MapPost("api/coupon", (IMapper _mapper, [FromBody] CouponCreateDTO couponCreateDTO) =>
 {
 	if(string.IsNullOrWhiteSpace(couponCreateDTO.Name))
 	{
@@ -81,26 +82,12 @@ app.MapPost("api/coupon", ([FromBody] CouponCreateDTO couponCreateDTO) =>
 		return Results.BadRequest("Coupon already exists.");
 	}
 
-	Coupon coupon = new Coupon()
-	{
-		Name = couponCreateDTO.Name,
-		Percent = couponCreateDTO.Percent,
-		IsActive = couponCreateDTO.IsActive,
-		CreatedDate = DateTime.Now
-	};
-
+	var coupon = _mapper.Map<CouponCreateDTO, Coupon>(couponCreateDTO);
+	coupon.CreatedDate = DateTime.Now;
 	coupon.Id = CouponStore.Coupons is null ? 1 : CouponStore.Coupons.Max(c => c.Id) + 1;
 	CouponStore.Coupons.Add(coupon);
-	
-	CouponDTO couponDTO = new CouponDTO()
-	{
-		Id = coupon.Id,
-		Name = coupon.Name,
-		Percent = coupon.Percent,
-		IsActive = coupon.IsActive,
-		CreatedDate = coupon.CreatedDate
-	};
 
+	var couponDTO = _mapper.Map<Coupon, CouponDTO>(coupon);
 	return Results.CreatedAtRoute("GetCouponById", new { id = couponDTO.Id }, couponDTO);
 })
 .WithName("CreateCoupon")
