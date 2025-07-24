@@ -16,7 +16,15 @@ if (app.Environment.IsDevelopment())
 	app.UseSwaggerUI();
 }
 
-app.MapGet("/helloworld", () => Results.Ok("Hello World From Get Endpoint"));
+app.MapGet("/helloworld/{id:int}", (int id) =>
+{
+	if (id <= 0)
+	{
+		return Results.BadRequest("Incorrect Id");
+	}
+
+	return Results.Ok($"Hello World From GET Endpoint with id {id}");
+});
 app.MapPost("/helloworld", (string? value) =>
 {
 	if (string.IsNullOrWhiteSpace(value))
