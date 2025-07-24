@@ -45,14 +45,14 @@ app.MapGet("api/coupon", () =>
 	return Results.Ok(CouponStore.Coupons);
 })
 .WithName("GetCoupons")
-.Produces(200);
+.Produces<IEnumerable<Coupon>>(200);
 
 app.MapGet("api/coupon/{id:int}", (int id) =>
 {
 	return Results.Ok(CouponStore.Coupons.FirstOrDefault(c => c.Id == id));
 })
 .WithName("GetCouponById")
-.Produces(200);
+.Produces<Coupon>(200);
 
 app.MapPost("api/coupon", ([FromBody] Coupon coupon) =>
 {
