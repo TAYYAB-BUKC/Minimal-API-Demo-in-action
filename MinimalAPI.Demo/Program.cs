@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using MinimalAPI.Demo.Data;
+using MinimalAPI.Demo.DTOs;
 using MinimalAPI.Demo.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -55,25 +56,43 @@ app.MapGet("api/coupon/{id:int}", (int id) =>
 .WithName("GetCouponById")
 .Produces<Coupon>(200);
 
-app.MapPost("api/coupon", ([FromBody] Coupon coupon) =>
+app.MapPost("api/coupon", ([FromBody] CouponCreateDTO couponCreateDTO) =>
 {
-	if(coupon.Id > 0 || string.IsNullOrWhiteSpace(coupon.Name))
+	if(string.IsNullOrWhiteSpace(couponCreateDTO.Name))
 	{
 		return Results.BadRequest("Invalid coupon request.");
 	}
 
-	if(CouponStore.Coupons.FirstOrDefault(c=> c.Name.ToLower() == coupon.Name.ToLower()) is not null)
+	if(CouponStore.Coupons.FirstOrDefault(c=> c.Name.ToLower() == couponCreateDTO.Name.ToLower()) is not null)
 	{
 		return Results.BadRequest("Coupon already exists.");
 	}
 
+	Coupon coupon = new Coupon()
+	{
+		Name = couponCreateDTO.Name,
+		Percent = couponCreateDTO.Percent,
+		IsActive = couponCreateDTO.IsActive,
+		CreatedDate = DateTime.Now
+	};
+
 	coupon.Id = CouponStore.Coupons is null ? 1 : CouponStore.Coupons.Max(c => c.Id) + 1;
 	CouponStore.Coupons.Add(coupon);
-	return Results.CreatedAtRoute("GetCouponById", new { id = coupon.Id }, coupon);
+	
+	CouponDTO couponDTO = new CouponDTO()
+	{
+		Id = coupon.Id,
+		Name = coupon.Name,
+		Percent = coupon.Percent,
+		IsActive = coupon.IsActive,
+		CreatedDate = coupon.CreatedDate
+	};
+
+	return Results.CreatedAtRoute("GetCouponById", new { id = couponDTO.Id }, couponDTO);
 })
 .WithName("CreateCoupon")
-.Accepts<Coupon>("application/json")
-.Produces<Coupon>(201)
+.Accepts<CouponCreateDTO>("application/json")
+.Produces<CouponDTO>(201)
 .Produces(400);
 
 #endregion
