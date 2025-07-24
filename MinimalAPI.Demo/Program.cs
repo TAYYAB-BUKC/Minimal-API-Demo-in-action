@@ -1,11 +1,10 @@
 using AutoMapper;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using MinimalAPI.Demo.Data;
 using MinimalAPI.Demo.DTOs;
 using MinimalAPI.Demo.Mappings;
 using MinimalAPI.Demo.Models;
-using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +23,8 @@ builder.Services.AddSwaggerGen();
 //builder.Services.AddAutoMapper(new[] { MappingConfiguration });
 
 builder.Services.AddAutoMapper(cfg => { }, typeof(MappingConfiguration));
+
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 var app = builder.Build();
 
