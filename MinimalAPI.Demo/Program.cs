@@ -42,6 +42,11 @@ app.MapGet("api/coupon", () =>
 {
 	return Results.Ok(CouponStore.Coupons);
 });
+
+app.MapGet("api/coupon/{id:int}", (int id) =>
+{
+	return Results.Ok(CouponStore.Coupons.FirstOrDefault(c => c.Id == id));
+});
 #endregion
 
 app.UseHttpsRedirection();
