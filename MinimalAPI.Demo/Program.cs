@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using MinimalAPI.Demo.Data;
 using MinimalAPI.Demo.DTOs;
+using MinimalAPI.Demo.Mappings;
 using MinimalAPI.Demo.Models;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +13,16 @@ var builder = WebApplication.CreateBuilder(args);
 //builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+//builder.Services.AddAutoMapper(typeof(MappingConfiguration).Assembly);
+//builder.Services.AddAutoMapper(Assembly.GetEntryAssembly());
+//builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
+//builder.Services.AddAutoMapper(
+//		Type.Assembly(),
+//		typeof(MappingConfiguration).Assembly
+//	);
+//builder.Services.AddAutoMapper(new[] { MappingConfiguration });
+
+builder.Services.AddAutoMapper(cfg => { }, typeof(MappingConfiguration));
 
 var app = builder.Build();
 
