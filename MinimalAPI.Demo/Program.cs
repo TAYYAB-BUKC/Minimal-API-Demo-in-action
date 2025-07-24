@@ -43,12 +43,16 @@ if (app.Environment.IsDevelopment())
 app.MapGet("api/coupon", () =>
 {
 	return Results.Ok(CouponStore.Coupons);
-}).WithName("GetCoupons");
+})
+.WithName("GetCoupons")
+.Produces(200);
 
 app.MapGet("api/coupon/{id:int}", (int id) =>
 {
 	return Results.Ok(CouponStore.Coupons.FirstOrDefault(c => c.Id == id));
-}).WithName("GetCouponById");
+})
+.WithName("GetCouponById")
+.Produces(200);
 
 app.MapPost("api/coupon", ([FromBody] Coupon coupon) =>
 {
@@ -65,7 +69,11 @@ app.MapPost("api/coupon", ([FromBody] Coupon coupon) =>
 	coupon.Id = CouponStore.Coupons is null ? 1 : CouponStore.Coupons.Max(c => c.Id) + 1;
 	CouponStore.Coupons.Add(coupon);
 	return Results.CreatedAtRoute("GetCouponById", new { id = coupon.Id }, coupon);
-}).WithName("CreateCoupon");
+})
+.WithName("CreateCoupon")
+.Produces<Coupon>(201)
+.Produces(400);
+
 #endregion
 
 app.UseHttpsRedirection();
