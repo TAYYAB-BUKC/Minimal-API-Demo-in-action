@@ -40,8 +40,9 @@ if (app.Environment.IsDevelopment())
 //});
 
 #region Coupon Endpoints
-app.MapGet("api/coupon", () =>
+app.MapGet("api/coupon", (ILogger<Program> _logger) =>
 {
+	_logger.Log(LogLevel.Information, "Getting All Coupons");
 	return Results.Ok(CouponStore.Coupons);
 })
 .WithName("GetCoupons")
