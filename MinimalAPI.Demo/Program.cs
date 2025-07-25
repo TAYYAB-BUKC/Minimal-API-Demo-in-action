@@ -2,6 +2,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using MinimalAPI.Demo.Data;
 using MinimalAPI.Demo.Endpoints;
 using MinimalAPI.Demo.Mappings;
@@ -15,7 +16,36 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 //builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options => {
+	options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+	{
+		Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n " +
+					  "Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\n" +
+					  "Example: \"Bearer 12345abcdef\"",
+		Name = "Authorization",
+		In = ParameterLocation.Header,
+		Type = SecuritySchemeType.ApiKey,
+		Scheme = "Bearer"
+	});
+
+	options.AddSecurityRequirement(new OpenApiSecurityRequirement()
+	{
+		{
+			new OpenApiSecurityScheme
+			{
+				Reference = new OpenApiReference
+				{
+					Type = ReferenceType.SecurityScheme,
+					Id = "Bearer"
+				},
+				Scheme = "oauth2",
+				Name = "Bearer",
+				In = ParameterLocation.Header,
+			},
+			new List<string>()
+		}
+	});
+});
 //builder.Services.AddAutoMapper(typeof(MappingConfiguration).Assembly);
 //builder.Services.AddAutoMapper(Assembly.GetEntryAssembly());
 //builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
