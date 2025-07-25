@@ -2,6 +2,7 @@ using AutoMapper;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MinimalAPI.Demo.Data;
 using MinimalAPI.Demo.DTOs;
 using MinimalAPI.Demo.Mappings;
@@ -28,6 +29,11 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(cfg => { }, typeof(MappingConfiguration));
 
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+{
+	options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
 
 var app = builder.Build();
 
