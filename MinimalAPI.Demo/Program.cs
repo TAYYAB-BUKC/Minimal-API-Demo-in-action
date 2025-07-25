@@ -6,6 +6,8 @@ using MinimalAPI.Demo.Data;
 using MinimalAPI.Demo.DTOs;
 using MinimalAPI.Demo.Mappings;
 using MinimalAPI.Demo.Models;
+using MinimalAPI.Demo.Repository;
+using MinimalAPI.Demo.Repository.IRepository;
 using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,6 +34,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
 	options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+builder.Services.AddScoped<ICouponRepository, CouponRepository>();
 
 var app = builder.Build();
 
