@@ -134,15 +134,15 @@ namespace MinimalAPI.Demo.Endpoints
 			.Produces<APIResponse>(404)
 			.RequireAuthorization();
 
-			app.MapGet("api/coupon/special", async (string couponName, int pageSize, int pageNumber, ICouponRepository _couponRepository) =>
+			app.MapGet("api/coupon/special", async ([AsParameters] CouponRequest request) =>
 			{
-				var coupons = await _couponRepository.GetCouponsAsync();
-				if (couponName is not null)
+				var coupons = await request._couponRepository.GetCouponsAsync();
+				if (request.CouponName is not null)
 				{
-					coupons = coupons.Where(c => c.Name.Contains(couponName)).ToList();
+					coupons = coupons.Where(c => c.Name.Contains(request.CouponName)).ToList();
 				}
 
-				coupons = coupons.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+				coupons = coupons.Skip((request.PageNumber - 1) * request.PageSize).Take(request.PageSize).ToList();
 
 				APIResponse response = new()
 				{
@@ -169,5 +169,13 @@ namespace MinimalAPI.Demo.Endpoints
 			};
 			return Results.Ok(response);
 		}
+	}
+
+	public class CouponRequest
+	{
+		public string CouponName { get; set; }
+		public int PageSize { get; set; }
+		public int PageNumber { get; set; }
+		public ICouponRepository _couponRepository { get; set; }
 	}
 }
