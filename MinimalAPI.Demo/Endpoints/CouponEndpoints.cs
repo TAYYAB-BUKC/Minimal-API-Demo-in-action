@@ -129,7 +129,7 @@ namespace MinimalAPI.Demo.Endpoints
 			.Produces<APIResponse>(404);
 		}
 
-		public static async Task<IResult> GetCouponsAsync(ICouponRepository _couponRepository, ILogger _logger)
+		private static async Task<IResult> GetCouponsAsync(ICouponRepository _couponRepository, ILogger<Program> _logger)
 		{
 			_logger.Log(LogLevel.Information, "Getting All Coupons");
 			APIResponse response = new()
