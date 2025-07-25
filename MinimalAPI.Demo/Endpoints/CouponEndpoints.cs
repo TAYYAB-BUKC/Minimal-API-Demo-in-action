@@ -21,6 +21,7 @@ namespace MinimalAPI.Demo.Endpoints
 
 			app.MapGet("api/coupon/{id:int}", async (ICouponRepository _couponRepository, int id) =>
 			{
+				Console.WriteLine("Endpoint executed");
 				APIResponse response = new()
 				{
 					Data = await _couponRepository.GetCouponByIdAsync(id),
@@ -45,8 +46,12 @@ namespace MinimalAPI.Demo.Endpoints
 					   return Results.BadRequest(response);
 				   }
 
-				   return await next(context);
-    		   });
+				   Console.WriteLine("Before filter");
+				   var result = await next(context);
+				   Console.WriteLine("After filter");
+				   // After filter logic goes here
+				   return result;
+			   });
 
 			app.MapPost("api/coupon", async (ICouponRepository _couponRepository, IMapper _mapper, IValidator<CouponCreateDTO> createCouponValidator, [FromBody] CouponCreateDTO couponCreateDTO) =>
 			{
