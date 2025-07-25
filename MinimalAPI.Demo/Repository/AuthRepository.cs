@@ -62,7 +62,7 @@ namespace MinimalAPI.Demo.Repository
 					new(ClaimTypes.Role, user.Role),
 				}),
 				Expires = DateTime.Now.AddDays(7),
-				SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secretKey)), SecurityAlgorithms.Aes128CbcHmacSha256)
+				SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secretKey)), SecurityAlgorithms.HmacSha256Signature)
 			};
 
 			var token = tokenHandler.CreateToken(tokenDescriptor);
