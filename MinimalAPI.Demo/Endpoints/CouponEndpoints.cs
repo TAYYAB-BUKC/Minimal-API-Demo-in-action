@@ -133,6 +133,28 @@ namespace MinimalAPI.Demo.Endpoints
 			.Produces<APIResponse>(200)
 			.Produces<APIResponse>(404)
 			.RequireAuthorization();
+
+			app.MapGet("api/coupon/special", async (string couponName, int pageSize, int pageNumber, ICouponRepository _couponRepository) =>
+			{
+				var coupons = await _couponRepository.GetCouponsAsync();
+				if (couponName is not null)
+				{
+					coupons = coupons.Where(c => c.Name.Contains(couponName)).ToList();
+				}
+
+				coupons = coupons.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+
+				APIResponse response = new()
+				{
+					Data = coupons,
+					IsSuccess = true,
+					StatusCode = HttpStatusCode.OK,
+				};
+				return Results.Ok(response);
+			})
+			.WithName("GetSpecialCoupon")
+			.Produces<APIResponse>(200)
+			.RequireAuthorization();
 		}
 
 		[Authorize(Policy = "AdminOnly")]
