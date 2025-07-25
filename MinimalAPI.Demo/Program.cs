@@ -84,6 +84,10 @@ if (app.Environment.IsDevelopment())
 //	return Results.Ok($"Hello World From POST Endpoint with value {value}");
 //});
 
+app.UseAuthentication();
+
+app.UseAuthorization();
+
 app.ConfigureCouponEndpoints();
 
 app.ConfigureAuthEndpoints();
