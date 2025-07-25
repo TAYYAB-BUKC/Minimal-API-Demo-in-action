@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
 using MinimalAPI.Demo.Data;
 using MinimalAPI.Demo.DTOs;
-using MinimalAPI.Demo.Models;
 
 namespace MinimalAPI.Demo.FluentValidations
 {
