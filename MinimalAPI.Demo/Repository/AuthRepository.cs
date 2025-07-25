@@ -48,7 +48,7 @@ namespace MinimalAPI.Demo.Repository
 
 		public async Task<LoginResponseDTO> Authenticate(LoginRequestDTO request)
 		{
-			var user = await _dbContext.LocalUsers.FirstOrDefaultAsync(u => u.Username.ToLower() == username.ToLower());
+			var user = await _dbContext.LocalUsers.FirstOrDefaultAsync(u => u.Username.ToLower() == request.Username.ToLower());
 			if(user is null)
 			{
 				return new LoginResponseDTO();
@@ -60,7 +60,7 @@ namespace MinimalAPI.Demo.Repository
 				Subject = new ClaimsIdentity(new Claim[]
 				{
 					new(ClaimTypes.Name, user.Name),
-					new(ClaimTypes.Email, user.UserName),
+					new(ClaimTypes.Email, user.Username),
 					new(ClaimTypes.Role, user.Role),
 				}),
 				Expires = DateTime.Now.AddDays(7),
