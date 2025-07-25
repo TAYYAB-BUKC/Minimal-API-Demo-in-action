@@ -29,7 +29,8 @@ namespace MinimalAPI.Demo.Endpoints
 				return Results.Ok(response);
 			})
 			.WithName("GetCouponById")
-			.Produces<APIResponse>(200);
+			.Produces<APIResponse>(200)
+			.RequireAuthorization();
 
 			app.MapPost("api/coupon", async (ICouponRepository _couponRepository, IMapper _mapper, IValidator<CouponCreateDTO> createCouponValidator, [FromBody] CouponCreateDTO couponCreateDTO) =>
 			{
@@ -58,7 +59,8 @@ namespace MinimalAPI.Demo.Endpoints
 			.WithName("CreateCoupon")
 			.Accepts<CouponCreateDTO>("application/json")
 			.Produces<APIResponse>(201)
-			.Produces<APIResponse>(400);
+			.Produces<APIResponse>(400)
+			.RequireAuthorization();
 
 			app.MapPut("api/coupon", async (ICouponRepository _couponRepository, IMapper _mapper, IValidator<CouponUpdateDTO> couponUpdateValidator, [FromBody] CouponUpdateDTO couponUpdateDTO) =>
 			{
@@ -96,7 +98,8 @@ namespace MinimalAPI.Demo.Endpoints
 			.Accepts<CouponUpdateDTO>("application/json")
 			.Produces<APIResponse>(200)
 			.Produces<APIResponse>(400)
-			.Produces<APIResponse>(404);
+			.Produces<APIResponse>(404)
+			.RequireAuthorization();
 
 			app.MapDelete("api/coupon/{id:int}", async (ICouponRepository _couponRepository, int id) =>
 			{
@@ -128,7 +131,8 @@ namespace MinimalAPI.Demo.Endpoints
 			.WithName("DeleteCouponById")
 			.Produces<APIResponse>(400)
 			.Produces<APIResponse>(200)
-			.Produces<APIResponse>(404);
+			.Produces<APIResponse>(404)
+			.RequireAuthorization();
 		}
 
 		[Authorize(Policy = "AdminOnly")]
