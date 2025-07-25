@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MinimalAPI.Demo.DTOs;
 using MinimalAPI.Demo.Models;
+using MinimalAPI.Demo.Repository;
 using MinimalAPI.Demo.Repository.IRepository;
 using System.Net;
 
@@ -28,9 +29,24 @@ namespace MinimalAPI.Demo.Endpoints
 				};
 				return Results.Ok(response);
 			})
-			.WithName("GetCouponById")
-			.Produces<APIResponse>(200)
-			.RequireAuthorization();
+			   .WithName("GetCouponById")
+			   .Produces<APIResponse>(200)
+			   //.RequireAuthorization()
+			   .AddEndpointFilter(async (context, next) => {
+				   var id = context.GetArgument<int>(1);
+				   if(id <= 0)
+				   {
+					   APIResponse response = new()
+					   {
+						   ErrorMessages = new List<string> { "Invalid coupon id!!!" },
+						   IsSuccess = false,
+						   StatusCode = HttpStatusCode.BadRequest
+					   };
+					   return Results.BadRequest(response);
+				   }
+
+				   return await next(context);
+    		   });
 
 			app.MapPost("api/coupon", async (ICouponRepository _couponRepository, IMapper _mapper, IValidator<CouponCreateDTO> createCouponValidator, [FromBody] CouponCreateDTO couponCreateDTO) =>
 			{
