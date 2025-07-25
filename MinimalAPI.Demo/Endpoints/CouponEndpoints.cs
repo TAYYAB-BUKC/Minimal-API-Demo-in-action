@@ -12,19 +12,9 @@ namespace MinimalAPI.Demo.Endpoints
 	{
 		public static void ConfigureCouponEndpoints(this WebApplication app)
 		{
-			app.MapGet("api/coupon", async (ICouponRepository _couponRepository, ILogger<Program> _logger) =>
-			{
-				_logger.Log(LogLevel.Information, "Getting All Coupons");
-				APIResponse response = new()
-				{
-					Data = await _couponRepository.GetCouponsAsync(),
-					IsSuccess = true,
-					StatusCode = HttpStatusCode.OK,
-				};
-				return Results.Ok(response);
-			})
-			.WithName("GetCoupons")
-			.Produces<APIResponse>(200);
+			app.MapGet("api/coupon", GetCouponsAsync)
+			   .WithName("GetCoupons")
+			   .Produces<APIResponse>(200);
 
 			app.MapGet("api/coupon/{id:int}", async (ICouponRepository _couponRepository, int id) =>
 			{
@@ -137,6 +127,18 @@ namespace MinimalAPI.Demo.Endpoints
 			.Produces<APIResponse>(400)
 			.Produces<APIResponse>(200)
 			.Produces<APIResponse>(404);
+		}
+
+		public static async Task<IResult> GetCouponsAsync(ICouponRepository _couponRepository, ILogger _logger)
+		{
+			_logger.Log(LogLevel.Information, "Getting All Coupons");
+			APIResponse response = new()
+			{
+				Data = await _couponRepository.GetCouponsAsync(),
+				IsSuccess = true,
+				StatusCode = HttpStatusCode.OK,
+			};
+			return Results.Ok(response);
 		}
 	}
 }
