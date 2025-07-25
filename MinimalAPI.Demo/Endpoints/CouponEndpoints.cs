@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MinimalAPI.Demo.DTOs;
 using MinimalAPI.Demo.Models;
@@ -14,8 +15,8 @@ namespace MinimalAPI.Demo.Endpoints
 		{
 			app.MapGet("api/coupon", GetCouponsAsync)
 			   .WithName("GetCoupons")
-			   .Produces<APIResponse>(200)
-			   .RequireAuthorization("AdminOnly");
+			   .Produces<APIResponse>(200);
+			   //.RequireAuthorization("AdminOnly");
 
 			app.MapGet("api/coupon/{id:int}", async (ICouponRepository _couponRepository, int id) =>
 			{
@@ -130,6 +131,7 @@ namespace MinimalAPI.Demo.Endpoints
 			.Produces<APIResponse>(404);
 		}
 
+		[Authorize(Policy = "AdminOnly")]
 		private static async Task<IResult> GetCouponsAsync(ICouponRepository _couponRepository, ILogger<Program> _logger)
 		{
 			_logger.Log(LogLevel.Information, "Getting All Coupons");
