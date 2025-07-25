@@ -11,5 +11,11 @@ namespace MinimalAPI.Demo.Data
 		}
 
 		public DbSet<Coupon> Coupons { get; set; }
+
+		protected override void OnModelCreating(ModelBuilder modelBuilder)
+		{
+			modelBuilder.Entity<Coupon>().HasData(CouponStore.Coupons);
+			base.OnModelCreating(modelBuilder);
+		}
 	}
 }
