@@ -1,9 +1,15 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using MinimalAPI.Demo.Data;
 using MinimalAPI.Demo.DTOs;
 using MinimalAPI.Demo.Models;
 using MinimalAPI.Demo.Repository.IRepository;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Permissions;
+using System.Text;
 
 namespace MinimalAPI.Demo.Repository
 {
@@ -11,10 +17,12 @@ namespace MinimalAPI.Demo.Repository
 	{
 		private readonly ApplicationDbContext _dbContext;
 		private readonly IMapper _mapper;
-		public AuthRepository(ApplicationDbContext dbContext, IMapper mapper)
+		private string secretKey;
+		public AuthRepository(ApplicationDbContext dbContext, IMapper mapper, IConfiguration _configuration)
 		{
 			_dbContext = dbContext;
 			_mapper = mapper;
+			secretKey = _configuration.GetValue<string>("JWTSecretKey");
 		}
 
 		public async Task<bool> IsUserUnique(string username)
@@ -38,9 +46,33 @@ namespace MinimalAPI.Demo.Repository
 			return _mapper.Map<UserDTO>(user);
 		}
 
-		public Task<LoginResponseDTO> Authenticate(LoginRequestDTO request)
+		public async Task<LoginResponseDTO> Authenticate(LoginRequestDTO request)
 		{
-			throw new NotImplementedException();
+			var user = await _dbContext.LocalUsers.FirstOrDefaultAsync(u => u.Username.ToLower() == username.ToLower());
+			if(user is null)
+			{
+				return new LoginResponseDTO();
+			}
+
+			var tokenHandler = new JwtSecurityTokenHandler();
+			var tokenDescriptor = new SecurityTokenDescriptor()
+			{
+				Subject = new ClaimsIdentity(new Claim[]
+				{
+					new(ClaimTypes.Name, user.Name),
+					new(ClaimTypes.Email, user.UserName),
+					new(ClaimTypes.Role, user.Role),
+				}),
+				Expires = DateTime.Now.AddDays(7),
+				SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secretKey)), SecurityAlgorithms.Aes128CbcHmacSha256)
+			};
+
+			var token = tokenHandler.CreateToken(tokenDescriptor);
+			return new()
+			{
+				User = _mapper.Map<UserDTO>(user),
+				Token = tokenHandler.WriteToken(token)
+			};
 		}
 	}
 }
