@@ -32,7 +32,7 @@ namespace MinimalAPI.Demo.Endpoints
 			})
 			   .WithName("GetCouponById")
 			   .Produces<APIResponse>(200)
-			   //.RequireAuthorization()
+			   .RequireAuthorization()
 			   .AddEndpointFilter(async (context, next) => {
 				   var id = context.GetArgument<int>(1);
 				   if(id <= 0)
@@ -46,12 +46,18 @@ namespace MinimalAPI.Demo.Endpoints
 					   return Results.BadRequest(response);
 				   }
 
-				   Console.WriteLine("Before filter");
+				   Console.WriteLine("Before 1st filter");
 				   var result = await next(context);
-				   Console.WriteLine("After filter");
+				   Console.WriteLine("After 1st filter");
 				   // After filter logic goes here
 				   return result;
-			   });
+			   })
+			   .AddEndpointFilter(async (context, next) => {
+				   Console.WriteLine("Before 2nd filter");
+				   var result = await next(context);
+				   Console.WriteLine("After 2nd filter");
+				   return result;
+			   }); ;
 
 			app.MapPost("api/coupon", async (ICouponRepository _couponRepository, IMapper _mapper, IValidator<CouponCreateDTO> createCouponValidator, [FromBody] CouponCreateDTO couponCreateDTO) =>
 			{
