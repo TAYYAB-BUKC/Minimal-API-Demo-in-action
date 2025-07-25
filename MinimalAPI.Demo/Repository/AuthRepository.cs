@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MinimalAPI.Demo.Data;
@@ -8,7 +7,6 @@ using MinimalAPI.Demo.Models;
 using MinimalAPI.Demo.Repository.IRepository;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Permissions;
 using System.Text;
 
 namespace MinimalAPI.Demo.Repository
@@ -48,8 +46,8 @@ namespace MinimalAPI.Demo.Repository
 
 		public async Task<LoginResponseDTO> Authenticate(LoginRequestDTO request)
 		{
-			var user = await _dbContext.LocalUsers.FirstOrDefaultAsync(u => u.Username.ToLower() == request.Username.ToLower());
-			if(user is null)
+			var user = await _dbContext.LocalUsers.FirstOrDefaultAsync(u => u.Username.ToLower() == request.Username.ToLower() && u.Password.ToLower() == request.Password.ToLower());
+			if (user is null)
 			{
 				return new LoginResponseDTO();
 			}
