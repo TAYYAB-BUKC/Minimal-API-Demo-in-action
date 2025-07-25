@@ -14,7 +14,8 @@ namespace MinimalAPI.Demo.Endpoints
 		{
 			app.MapGet("api/coupon", GetCouponsAsync)
 			   .WithName("GetCoupons")
-			   .Produces<APIResponse>(200);
+			   .Produces<APIResponse>(200)
+			   .RequireAuthorization();
 
 			app.MapGet("api/coupon/{id:int}", async (ICouponRepository _couponRepository, int id) =>
 			{
